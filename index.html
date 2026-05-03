@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bluebook Exam Viewer (Adaptive Labels)</title>
+  <title>Bluebook Mobile Viewer</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     
@@ -21,7 +21,7 @@
       --radius: 12px;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     
     body {
       font-family: 'Inter', sans-serif;
@@ -33,116 +33,94 @@
       overflow: hidden;
     }
 
-    /* Layout */
+    /* Sidebar - Responsive */
     #sidebar {
       width: 320px;
       background: var(--surface);
       border-right: 1px solid var(--surface-border);
       display: flex;
       flex-direction: column;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1000;
     }
+
     .sidebar-header {
       padding: 20px;
       border-bottom: 1px solid var(--surface-border);
     }
-    #nav-list {
-      flex: 1;
-      overflow-y: auto;
-      list-style: none;
-      padding: 10px;
-    }
-    .nav-sec {
-      margin-top: 15px;
-      margin-bottom: 5px;
-      padding: 5px 10px;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      color: var(--primary);
-      font-weight: 800;
-      letter-spacing: 1px;
-      border-bottom: 1px solid rgba(59, 130, 246, 0.2);
-    }
-    .nav-item {
-      padding: 10px 15px;
-      border-radius: 8px;
-      margin-bottom: 4px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      color: var(--text-muted);
-    }
+
+    #nav-list { flex: 1; overflow-y: auto; list-style: none; padding: 10px; }
+    .nav-sec { margin-top: 15px; margin-bottom: 5px; padding: 5px 10px; font-size: 0.75rem; text-transform: uppercase; color: var(--primary); font-weight: 800; letter-spacing: 1px; border-bottom: 1px solid rgba(59, 130, 246, 0.2); }
+    .nav-item { padding: 12px 15px; border-radius: 8px; margin-bottom: 4px; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; color: var(--text-muted); }
     .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text); }
     .nav-item.active { background: var(--primary); color: white; font-weight: 500; }
 
-    #main-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      background: var(--bg);
-    }
+    #main-content { flex: 1; display: flex; flex-direction: column; background: var(--bg); position: relative; }
+
     #topbar {
       height: 60px;
       border-bottom: 1px solid var(--surface-border);
       display: flex;
       align-items: center;
-      padding: 0 30px;
+      padding: 0 15px;
       background: rgba(28, 31, 38, 0.8);
       backdrop-filter: blur(10px);
-    }
-    #question-container {
-      flex: 1;
-      overflow-y: auto;
-      padding: 40px;
-      display: flex;
-      flex-direction: column;
-      gap: 30px;
-      max-width: 1000px;
-      margin: 0 auto;
-      width: 100%;
+      gap: 15px;
     }
 
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--surface-border);
-      border-radius: var(--radius);
-      padding: 30px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    .menu-toggle {
+      display: none;
+      background: none; border: none; color: white; cursor: pointer; padding: 5px;
     }
-    
-    .stimulus { font-size: 1.1rem; color: var(--text); margin-bottom: 25px; line-height: 1.8; border-left: 4px solid var(--primary); padding-left: 20px; }
-    .stem { font-size: 1.15rem; font-weight: 500; margin-bottom: 25px; }
-    
-    .options { display: flex; flex-direction: column; gap: 12px; }
-    .option { display: flex; padding: 16px 20px; border: 1px solid var(--surface-border); border-radius: 8px; background: rgba(0,0,0,0.2); }
+
+    #question-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; max-width: 1000px; margin: 0 auto; width: 100%; }
+
+    .card { background: var(--surface); border: 1px solid var(--surface-border); border-radius: var(--radius); padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    .stimulus { font-size: 1rem; color: var(--text); margin-bottom: 20px; line-height: 1.6; border-left: 4px solid var(--primary); padding-left: 15px; }
+    .stem { font-size: 1.1rem; font-weight: 500; margin-bottom: 20px; }
+    .options { display: flex; flex-direction: column; gap: 10px; }
+    .option { display: flex; padding: 14px 16px; border: 1px solid var(--surface-border); border-radius: 8px; background: rgba(0,0,0,0.2); }
     .option.correct { border-color: var(--correct); background: var(--correct-bg); }
-    .opt-letter { font-weight: 700; margin-right: 15px; color: var(--text-muted); }
-    .option.correct .opt-letter { color: var(--correct); }
+    .opt-letter { font-weight: 700; margin-right: 12px; color: var(--text-muted); }
 
-    .spr-answer { font-size: 1.5rem; font-weight: bold; color: var(--correct); background: var(--correct-bg); padding: 15px 25px; border-radius: 8px; border: 1px solid var(--correct); display: inline-block; }
-    .nav-btn { padding: 10px 24px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; }
+    .nav-btn { padding: 12px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; flex: 1; max-width: 200px; }
     .nav-btn:hover { background: var(--primary-hover); }
 
-    .fade-in { animation: fadeIn 0.4s ease forwards; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    /* Mobile Styles */
+    @media (max-width: 768px) {
+      .menu-toggle { display: block; }
+      #sidebar { position: absolute; left: 0; top: 0; bottom: 0; transform: translateX(-100%); width: 280px; }
+      #sidebar.open { transform: translateX(0); box-shadow: 10px 0 50px rgba(0,0,0,0.5); }
+      .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 999; }
+      .sidebar-overlay.open { display: block; }
+      #question-container { padding: 15px; }
+      .nav-btn { font-size: 0.9rem; padding: 10px 15px; }
+    }
+
+    .fade-in { animation: fadeIn 0.3s ease forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
   </style>
 </head>
 <body>
 
+  <div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
+
   <div id="sidebar">
     <div class="sidebar-header">
-      <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Intercepted Package</div>
-      <div id="exam-title" style="margin-top: 4px; font-size: 16px; color: var(--primary); font-weight: 700;">Operational Exam</div>
+      <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Exam Package</div>
+      <div id="exam-title" style="margin-top: 4px; font-size: 15px; color: var(--primary); font-weight: 700;">Operational Exam</div>
     </div>
     <ul id="nav-list"></ul>
   </div>
 
   <div id="main-content">
     <div id="topbar">
-      <div id="current-section-title" style="font-weight: 600; font-size: 1.1rem; flex: 1;">Question Details</div>
-      <div id="question-counter" style="color: var(--text-muted); font-size: 0.9rem;"></div>
+      <button class="menu-toggle" onclick="toggleSidebar()">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <div id="current-section-title" style="font-weight: 600; font-size: 0.95rem; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Loading...</div>
+      <div id="question-counter" style="color: var(--text-muted); font-size: 0.8rem; white-space: nowrap;"></div>
     </div>
     <div id="question-container"></div>
   </div>
@@ -156,20 +134,20 @@
     let questions = [];
     let currentIdx = 0;
 
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('open');
+        document.getElementById('overlay').classList.toggle('open');
+    }
+
     function init() {
         document.getElementById('exam-title').innerText = examData.title || 'SAT Operational Exam';
-        
         questions = [];
         const navList = document.getElementById('nav-list');
         navList.innerHTML = '';
-
-        let m2CountRW = 0;
-        let m2CountMath = 0;
+        let m2CountRW = 0, m2CountMath = 0;
 
         examData.sections.forEach((sec, sIdx) => {
             let displayTitle = sec.title || `Section ${sIdx + 1}`;
-            
-            // Rename logic based on User Request
             if (displayTitle.includes('Reading and Writing') && displayTitle.includes('Module 2')) {
                 m2CountRW++;
                 displayTitle = displayTitle.replace('Module 2', m2CountRW === 1 ? 'Module 2 (Easy)' : 'Module 2 (Hard)');
@@ -187,20 +165,13 @@
             (sec.chunks || []).forEach((chunk) => {
                 (chunk.items || []).forEach((item) => {
                     const qIdx = questions.length;
-                    questions.push({
-                        secId: sec.id,
-                        secDisplay: displayTitle,
-                        qNum: qCounter,
-                        item: item
-                    });
-
+                    questions.push({ secId: sec.id, secDisplay: displayTitle, qNum: qCounter, item: item });
                     const li = document.createElement('li');
                     li.className = 'nav-item';
                     li.id = `nav-${qIdx}`;
-                    li.innerHTML = `#${qCounter} — ${item.id.substring(0, 5)}...`;
-                    li.onclick = () => renderQuestion(qIdx);
+                    li.innerHTML = `<span style="margin-right:8px; opacity:0.6">#${qCounter}</span> ${item.id.substring(0, 8)}...`;
+                    li.onclick = () => { renderQuestion(qIdx); if(window.innerWidth < 768) toggleSidebar(); };
                     navList.appendChild(li);
-
                     qCounter++;
                 });
             });
@@ -212,20 +183,14 @@
     function renderQuestion(idx) {
         if (idx < 0 || idx >= questions.length) return;
         currentIdx = idx;
-        
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         const activeNav = document.getElementById(`nav-${idx}`);
-        if(activeNav) {
-            activeNav.classList.add('active');
-            activeNav.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
+        if(activeNav) activeNav.classList.add('active');
 
         const q = questions[idx];
         const item = q.item;
-        
-        document.getElementById('current-section-title').innerText = `${q.secDisplay} | Question ${q.qNum}`;
-        document.getElementById('question-counter').innerText = `${idx + 1} / ${questions.length}`;
-
+        document.getElementById('current-section-title').innerText = `${q.secDisplay} | Q${q.qNum}`;
+        document.getElementById('question-counter').innerText = `${idx + 1}/${questions.length}`;
         const container = document.getElementById('question-container');
         
         let correctKeys = [];
@@ -243,31 +208,15 @@
             const letters = ['A', 'B', 'C', 'D'];
             item.answerOptions.forEach((opt, i) => {
                 const isCorrect = correctKeys.includes(opt.id);
-                html += `
-                    <div class="option ${isCorrect ? 'correct' : ''}">
-                        <div class="opt-letter">${letters[i]}</div>
-                        <div class="opt-content">${opt.content}</div>
-                    </div>
-                `;
+                html += `<div class="option ${isCorrect ? 'correct' : ''}"><div class="opt-letter">${letters[i]}</div><div class="opt-content">${opt.content}</div></div>`;
             });
             html += `</div>`;
         } else {
-            html += `
-                <div style="margin-top: 20px;">
-                    <div style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Official Correct Answer</div>
-                    <div class="spr-answer">${correctKeys.join(' / ') || 'N/A'}</div>
-                </div>
-            `;
+            html += `<div style="margin-top:20px;"><div style="color:var(--text-muted); font-size:0.75rem; text-transform:uppercase; margin-bottom:5px;">Official Answer</div><div class="spr-answer" style="font-size:1.2rem; padding:12px 20px;">${correctKeys.join(' / ') || 'N/A'}</div></div>`;
         }
 
         html += `</div>`;
-        html += `
-            <div style="display: flex; justify-content: space-between; margin-top: 10px;" class="fade-in">
-                <button class="nav-btn" style="background: var(--surface-border);" onclick="renderQuestion(${idx - 1})" ${idx === 0 ? 'disabled' : ''}>← Previous</button>
-                <button class="nav-btn" onclick="renderQuestion(${idx + 1})" ${idx === questions.length - 1 ? 'disabled' : ''}>Next →</button>
-            </div>
-        `;
-
+        html += `<div style="display: flex; gap: 10px; margin-top: 10px; padding-bottom: 20px;" class="fade-in"><button class="nav-btn" style="background:var(--surface-border);" onclick="renderQuestion(${idx - 1})" ${idx === 0 ? 'disabled' : ''}>Back</button><button class="nav-btn" onclick="renderQuestion(${idx + 1})" ${idx === questions.length - 1 ? 'disabled' : ''}>Next</button></div>`;
         container.innerHTML = html;
         container.scrollTop = 0;
     }
