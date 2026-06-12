@@ -21,10 +21,10 @@
 </head>
 <body>
     <div class="container">
-        <h1>Higher/Lower Search</h1>
-        <input type="text" id="searchInput" placeholder="Type a name here... (e.g., Jackie Chan)" autocomplete="off" autofocus>
+        <h1>R cheat sheet</h1>
+        <input type="text" id="searchInput" placeholder="Type a name here... (e.g., Rayan the best)" autocomplete="off" autofocus>
         <div id="results">
-            <div class="empty-state">Start typing to see values...</div>
+            <div class="empty-state">Start typing to see answers</div>
         </div>
     </div>
 
@@ -39,7 +39,7 @@
             const query = event.target.value.toLowerCase().trim();
 
             if (query === '') {
-                resultsDiv.innerHTML = '<div class="empty-state">Start typing to see values...</div>';
+                resultsDiv.innerHTML = '<div class="empty-state">Start typing to see answers...</div>';
                 return;
             }
 
@@ -51,7 +51,7 @@
             resultsDiv.innerHTML = '';
 
             if (filteredResults.length === 0) {
-                resultsDiv.innerHTML = '<div class="empty-state">No matches found.</div>';
+                resultsDiv.innerHTML = '<div class="empty-state">Type better, no matches bro...</div>';
                 return;
             }
 
